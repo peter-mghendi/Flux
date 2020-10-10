@@ -10,6 +10,8 @@ using Microsoft.Extensions.Logging;
 using Fluxor;
 using System.Reflection;
 using Flux.Services;
+using Flux.Middleware;
+using Blazored.LocalStorage;
 
 namespace Flux
 {
@@ -23,11 +25,15 @@ namespace Flux
             // builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri("https://jsonplaceholder.typicode.com") });
 
+            // Add LocalStorage
+            builder.Services.AddBlazoredLocalStorage();
+
             // Add Fluxor
             builder.Services.AddFluxor(options => 
             {
                 options.ScanAssemblies(Assembly.GetExecutingAssembly());
                 options.UseReduxDevTools();
+                options.AddMiddleware<PersistenceMiddleware>();
             });
             
             builder.Services.AddScoped<StateFacade>();
