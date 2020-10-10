@@ -1,3 +1,5 @@
+#nullable disable
+
 using Fluxor;
 using Microsoft.Extensions.Logging;
 using Flux.Models.Todos;

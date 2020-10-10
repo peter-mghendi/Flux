@@ -1,5 +1,7 @@
+using System;
 using Fluxor;
 using Flux.Store.State;
+using Blazored.LocalStorage;
 
 namespace Flux.Store.Features.Todos
 {
@@ -7,7 +9,9 @@ namespace Flux.Store.Features.Todos
     {
         public override string GetName() => "Todos";
 
-        protected override TodosState GetInitialState() =>
-            new TodosState(false, null, null, null);
+        protected override TodosState GetInitialState() 
+        {
+            return new TodosState(false, null, null, null);
+        }
     }
 }

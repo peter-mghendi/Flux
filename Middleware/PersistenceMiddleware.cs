@@ -1,9 +1,10 @@
-using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
+using Flux.Models.Todos;
 using Flux.Store.Features.Todos.Actions.LoadTodos;
+using Flux.Store.State;
 using Fluxor;
-using Newtonsoft.Json;
 using AbstractMiddleware = Fluxor.Middleware;
 
 namespace Flux.Middleware
@@ -12,9 +13,9 @@ namespace Flux.Middleware
     {
         private IStore? Store;
 
-        private readonly ILocalStorageService _localStorage;
+        private readonly ISyncLocalStorageService _localStorage;
 
-        public PersistenceMiddleware(ILocalStorageService localStorage)
+        public PersistenceMiddleware(ISyncLocalStorageService localStorage)
 		{
             _localStorage = localStorage;
 		}
@@ -22,16 +23,20 @@ namespace Flux.Middleware
         public override Task InitializeAsync(IStore store)
         {
             Store = store;
-            Console.WriteLine(nameof(InitializeAsync));
             return Task.CompletedTask;
         }
 
-        public async override void AfterDispatch(object action)
+        public override void AfterDispatch(object action)
         {
-            if (action is LoadTodosSuccessAction a)
+            if (action is LoadTodosSuccessAction)
             {
                 var state = Store!.Features["Todos"].GetState();
-                await _localStorage.SetItemAsync<object>("Todos", state);
+
+                if (state is TodosState todosState)
+                {
+                    _localStorage.SetItem<IEnumerable<TodoDTO>>("todos", 
+                        todosState.CurrentTodos ?? new List<TodoDTO>());
+                }
             }
         }
     }
